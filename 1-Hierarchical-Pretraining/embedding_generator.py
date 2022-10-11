@@ -14,10 +14,11 @@
 import argparse
 import os
 
+import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
-from torch import nn
+from PIL import Image
 from torchvision import datasets
 from torchvision import transforms as pth_transforms
 
@@ -25,15 +26,42 @@ import utils
 from HIPT_4K.hipt_256 import HIPT_256
 
 
+def padding(array, xx, yy):
+    """
+    :param array: numpy array
+    :param xx: desired height
+    :param yy: desirex width
+    :return: padded array
+    """
+
+    h = array.shape[0]
+    w = array.shape[1]
+
+    a = (xx - h) // 2
+    aa = xx - a - h
+
+    b = (yy - w) // 2
+    bb = yy - b - w
+
+    return np.pad(array, pad_width=((a, aa), (b, bb)), mode='constant')
+
+
 class Dataset(datasets.ImageFolder):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, mask_dir=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.mask_dir = mask_dir
 
     def __getitem__(self, item):
         sample, target = super(Dataset, self).__getitem__(item)
         name = self.samples[item]
         name = os.path.split(os.path.splitext(name)[0])[1]
+        if self.mask_dir:
+            tissue_mask = Image.open(os.path.join(self.mask_dir, name + '.png'))
+            tissue_mask = np.array(tissue_mask.convert('1'))
+            sample = np.array(sample) * tissue_mask
+            sample = padding(sample, 256, 256)
+            sample = Image.fromarray(sample)
         return sample, name
 
 
@@ -43,7 +71,7 @@ def extract_feature_pipeline(args):
         pth_transforms.ToTensor(),
         pth_transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ])
-    dataset = Dataset(args.data_path, transform=transform)
+    dataset = Dataset(root=args.data_path, mask_dir=args.mask_dir, transform=transform)
     # data_loader = torch.utils.data.DataLoader(
     #     dataset,
     #     batch_size=args.batch_size,
@@ -60,7 +88,7 @@ def extract_feature_pipeline(args):
     metric_logger = utils.MetricLogger(delimiter="  ")
     for sample, name in metric_logger.log_every(dataset, 10):
         feature = model(sample)
-        torch.save(feature, os.path.join(args.save_path, name+'.pt'))
+        torch.save(feature, os.path.join(args.save_path, name + '.pt'))
 
 
 @torch.no_grad()
