@@ -71,7 +71,7 @@ def extract_feature_pipeline(args):
         pth_transforms.ToTensor(),
         pth_transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ])
-    dataset = Dataset(root=args.data_path, mask_dir=args.mask_dir, transform=transform)
+    dataset = Dataset(root=args.data_path, mask_dir=args.mask_path, transform=transform)
     # data_loader = torch.utils.data.DataLoader(
     #     dataset,
     #     batch_size=args.batch_size,
@@ -195,6 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', default=10, type=int, help='Number of data loading workers per GPU.')
     parser.add_argument('--data_path', default='/path/to/imagenet/', type=str)
     parser.add_argument('--save_path', default='/path/to/imagenet/', type=str)
+    parser.add_argument('--mask_path', default='/path/to/imagenet/', type=str)
 
     args = parser.parse_args()
     #
