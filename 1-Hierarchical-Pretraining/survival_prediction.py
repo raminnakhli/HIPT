@@ -1,7 +1,7 @@
 import argparse
 import os
 import os.path
-from turtle import pd
+import pandas as pd
 
 import lifelines
 import numpy as np
