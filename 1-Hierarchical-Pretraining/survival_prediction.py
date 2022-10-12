@@ -1,6 +1,8 @@
 import argparse
 import os
 import os.path
+from builtins import map
+
 import pandas as pd
 
 import lifelines
@@ -926,7 +928,7 @@ class MyDataset(Dataset):
             self.files.append(data)
 
     def _read_record(self, f: str, ids):
-        feature = torch.load(f)
+        feature = torch.load(f, map_location='cpu')
         core_id = filename_to_patient_id(f, self._dataset_name)
         study_id = self._core_to_study_id.loc[self._core_to_study_id.core_id == core_id]
         if study_id.shape[0] == 0:
