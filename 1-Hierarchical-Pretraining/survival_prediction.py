@@ -1087,7 +1087,7 @@ def train():
                                                                                 drop_partial=True)
 
             cindex = c_index_score(risk_pred_all, censor_all, time_all)
-            metric_logger.update({'cindex train': cindex})
+            metric_logger.update(cindex_train= cindex)
 
             metrics = test(model, test_loader)
             metric_logger.update(**metrics)
