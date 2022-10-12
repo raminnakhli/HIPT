@@ -1036,7 +1036,7 @@ def train():
     parser.add_argument('--data_path', default='/path/to/imagenet/', type=str)
     parser.add_argument('--dataset_name', default='tumorbank', type=str)
     parser.add_argument('--seed', default=0, type=int)
-    parser.add_argument('--lr', default=0.02, type=int)
+    parser.add_argument('--lr', default=0.02, type=float)
     parser.add_argument('--epoch', default=30, type=int)
 
     args = parser.parse_args()
@@ -1060,6 +1060,8 @@ def train():
             model.train()
             for feature, censor, time, _ in metric_logger.log_every(train_loader, 1):
                 feature = feature.cuda()
+                censor = censor.cuda()
+                time = time.cuda()
 
                 opt.zero_grad()
                 pred = model(feature)
