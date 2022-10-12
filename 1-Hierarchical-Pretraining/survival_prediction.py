@@ -1059,8 +1059,12 @@ def train():
 
         metric_logger = utils.MetricLogger(delimiter="  ")
         for epoch in metric_logger.log_every(range(args.epoch), 1):
+            censor_all, time_all, pred_all, study_all, risk_pred_all = np.array([]), np.array([]), np.array(
+                []), np.array(
+                []), np.array([])
+
             model.train()
-            for feature, censor, time, _ in train_loader:
+            for feature, censor, time, study_id in train_loader:
                 feature = feature.cuda()
                 censor = censor.cuda()
                 time = time.cuda()
@@ -1070,6 +1074,20 @@ def train():
                 loss = cox_loss(time, censor, pred)
                 loss.backward()
                 opt.step()
+
+                risk_pred_all = np.concatenate((risk_pred_all, pred.detach().cpu().numpy().reshape(-1)))
+                censor_all = np.concatenate((censor_all, censor.detach().cpu().numpy().reshape(-1)))
+                time_all = np.concatenate((time_all, time.detach().cpu().numpy().reshape(-1)))
+                study_all = np.concatenate((study_all, study_id.detach().cpu().numpy().reshape(-1)))
+
+            risk_pred_all, censor_all, time_all, df = hazard_average_by_patient(risk_pred_all,
+                                                                                censor_all,
+                                                                                time_all,
+                                                                                study_all,
+                                                                                drop_partial=True)
+
+            cindex = c_index_score(risk_pred_all, censor_all, time_all)
+            metric_logger.update({'cindex train': cindex})
 
             metrics = test(model, test_loader)
             metric_logger.update(**metrics)
