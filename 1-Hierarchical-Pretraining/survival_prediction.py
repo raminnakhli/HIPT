@@ -995,7 +995,7 @@ def hazard_average_by_patient(hazard: np.ndarray, censor: np.ndarray, surv_time:
     df = pd.DataFrame(
         {'hazard': hazard, 'censor': censor, 'surv_time': surv_time, 'study_id': study_id})
 
-    aggregation = df.groupby('study_id').agg('max')
+    aggregation = df.groupby('study_id').agg('mean')
     aggregation['study_id'] = aggregation.index  # to get the study id as well
     return aggregation.hazard.values, aggregation.censor.values, aggregation.surv_time.values, aggregation
 
