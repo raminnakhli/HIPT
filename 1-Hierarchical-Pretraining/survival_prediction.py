@@ -914,9 +914,9 @@ def get_folded_study_ids(study_ids, k, dataset_name):
 class MyDataset(Dataset):
     def __init__(self, root, dataset_name, ids):
         super(MyDataset, self).__init__()
-        self._outcome = pd.read_csv(os.path.join(self.raw_dir, 'outcome.csv'))
-        self._core_to_study_id = pd.read_csv(os.path.join(self.raw_dir, 'core_id.csv'))
-        self._invalid_study_ids = pd.read_csv(os.path.join(self.raw_dir, 'invalid_study_ids.csv')).study_id.values
+        self._outcome = pd.read_csv(os.path.join(root, 'outcome.csv'))
+        self._core_to_study_id = pd.read_csv(os.path.join(root, 'core_id.csv'))
+        self._invalid_study_ids = pd.read_csv(os.path.join(root, 'invalid_study_ids.csv')).study_id.values
         self._dataset_name = dataset_name
         self.files = []
         for f in [os.path.join(root, f) for f in os.listdir(root) if f.endswith(".pt")]:
