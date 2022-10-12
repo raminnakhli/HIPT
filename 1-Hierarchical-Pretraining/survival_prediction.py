@@ -1054,7 +1054,7 @@ def train():
         test_loader = DataLoader(test_dataset, batch_size=256, shuffle=False, drop_last=False,
                                  num_workers=args.num_workers)
 
-        model = torch.nn.Linear(384, 1).cuda()
+        model = torch.nn.Linear(192, 1).cuda()
         opt = torch.optim.Adam(model.parameters(), lr=args.lr)
 
         metric_logger = utils.MetricLogger(delimiter="  ")
