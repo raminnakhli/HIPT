@@ -1014,7 +1014,7 @@ def test(model, test_loader):
         censor = censor.cuda()
 
         pred = model(feature)
-        loss = loss.cox_loss(time, censor, pred)
+        loss = cox_loss(time, censor, pred)
 
         risk_pred_all = np.concatenate((risk_pred_all, pred.detach().cpu().numpy().reshape(-1)))
         censor_all = np.concatenate((censor_all, censor.detach().cpu().numpy().reshape(-1)))
@@ -1060,7 +1060,7 @@ def train():
         metric_logger = utils.MetricLogger(delimiter="  ")
         for epoch in metric_logger.log_every(range(args.epoch), 1):
             model.train()
-            for feature, censor, time, _ in metric_logger.log_every(train_loader, 1):
+            for feature, censor, time, _ in train_loader:
                 feature = feature.cuda()
                 censor = censor.cuda()
                 time = time.cuda()
