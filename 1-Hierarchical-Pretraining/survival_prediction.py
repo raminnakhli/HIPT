@@ -1049,9 +1049,9 @@ def train():
                                   get_folded_study_ids(None, 3, args.dataset_name)[fold][0])
         test_dataset = MyDataset(args.data_path, args.dataset_name,
                                  get_folded_study_ids(None, 3, args.dataset_name)[fold][1])
-        train_loader = DataLoader(train_dataset, batch_size=256, shuffle=False, drop_last=False,
+        train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=False, drop_last=False,
                                   num_workers=args.num_workers)
-        test_loader = DataLoader(test_dataset, batch_size=256, shuffle=False, drop_last=False,
+        test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False, drop_last=False,
                                  num_workers=args.num_workers)
 
         model = torch.nn.Linear(192, 1).cuda()
